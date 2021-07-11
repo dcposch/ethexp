@@ -7,9 +7,12 @@ import type { Subscription } from 'web3-core-subscriptions'
 import { Block, VizBlocks } from './VizBlocks'
 import { VizMempool } from './VizMempool'
 import type { MempoolTx } from './VizMempool'
+import { Peer, PeerGeo, VizPeers } from './VizPeers'
+
+import ip2C from 'ip2country'
 
 interface AppState {
-  accounts: string[]
+  peers: PeerGeo[]
   // recent blocks, newest to oldest
   blocks: Block[]
   // mempool transactions
@@ -31,7 +34,7 @@ class App extends React.Component<{}, AppState> {
     super(props)
     this.fetchTimeout = 0
     this.mempool = {}
-    this.state = { accounts: [], blocks: [], mempoolTransactions: [] }
+    this.state = { peers: [], blocks: [], mempoolTransactions: [] }
   }
 
   componentDidMount() {
@@ -47,18 +50,16 @@ class App extends React.Component<{}, AppState> {
   }
 
   render() {
-    const { accounts, blocks, mempoolTransactions } = this.state
+    const { peers, blocks, mempoolTransactions } = this.state
     return (
       <div>
-        <h2>accounts</h2>
-        {accounts.length === 0 && 'no accounts'}
-        {accounts.map((a) => (
-          <span key={a}>{a}</span>
-        ))}
+        <h1>ethereum mainnet</h1>
         <h2>blocks</h2>
         <VizBlocks blocks={blocks} />
         <h2>mempool</h2>
         <VizMempool transactions={mempoolTransactions} />
+        <h2>peers</h2>
+        <VizPeers peers={peers} />
       </div>
     )
   }
@@ -90,8 +91,12 @@ class App extends React.Component<{}, AppState> {
   }
 
   fetch = async () => {
-    console.log('fetching accounts')
-    const accounts = await web3.eth.getAccounts()
+    const peers = (await web3Admin.peers()) as Peer[]
+    const peerGeos = peers.map((p) => {
+      const ip = p.network.remoteAddress.split(':')[0]
+      const country = ip2C(ip)
+      return Object.assign({ geo: { country }, ip }, p)
+    })
 
     console.log('fetching recent blocks')
     const txStatus = {} as { [hash: string]: boolean }
@@ -129,7 +134,7 @@ class App extends React.Component<{}, AppState> {
     console.log(`updated mempool, before: ${countBefore} after: ${mempoolTransactions.length} tx`)
 
     console.log('fetch complete')
-    this.setState({ accounts, blocks, mempoolTransactions })
+    this.setState({ peers: peerGeos, blocks, mempoolTransactions })
     this.fetchTimeout = window.setTimeout(this.fetch, FETCH_INT_MS)
   }
 
@@ -139,5 +144,14 @@ class App extends React.Component<{}, AppState> {
 }
 
 const web3 = new Web3('ws://192.168.1.25:8546')
+const web3Admin = web3.extend({
+  methods: [
+    {
+      name: 'peers',
+      call: 'admin_peers',
+    },
+  ],
+})
+
 const root = document.querySelector('#root')
 ReactDOM.render(<App />, root)

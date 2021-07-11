@@ -13,11 +13,43 @@ div {
   box-sizing: border-box;
 }
 
+.viz-peers,
 .viz-blocks,
 .viz-mempool {
   position: relative;
   width: 100%;
+  overflow: hidden;
+}
+
+.viz-blocks {
+  height: 150px;
+}
+
+.viz-mempool {
   height: 200px;
+}
+
+.viz-peers {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, 92px);
+  grid-gap: 6px;
+  justify-content: space-between;
+}
+
+.viz-peers::after {
+  content: '';
+  flex: auto;
+}
+
+.viz-peer {
+  font-size: 9px;
+  padding: 6px;
+  border: 1px solid #666;
+  margin: 4px 0;
+}
+
+.viz-peer-inner {
+  white-space: nowrap;
   overflow: hidden;
 }
 
@@ -61,13 +93,13 @@ div {
   width: 2px;
   height: 2px;
   border: none;
-  background-color: #aaa;
+  background-color: #ccc;
 }
 
 .viz-tx-succeeded {
-  background-color: #1b4;
+  background-color: #070;
 }
 
 .viz-tx-reverted {
-  background-color: #c55;
+  background-color: #b00;
 }
