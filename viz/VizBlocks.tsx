@@ -66,12 +66,15 @@ const STRIDE_PX = 3
 const TX_PER_ROW = 25
 
 function Block({ block, rightPx }: { block?: Block; rightPx: number }) {
+  const isLatest = rightPx === 0
   let contents = null
   if (block) {
     contents = (
       <>
         <div className='viz-block-box'>
-          <div className='viz-block-num'>#{block.number}</div>
+          <div className='viz-block-num'>
+            {isLatest ? <strong>#{block.number}</strong> : block.number}
+          </div>
           <div className='viz-block-gas'>{printGas(block.gasUsed)} gas</div>
         </div>
         <div className='viz-block-txs'>

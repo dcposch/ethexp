@@ -51,9 +51,12 @@ class App extends React.Component<{}, AppState> {
 
   render() {
     const { peers, blocks, mempoolTransactions } = this.state
+    const isoDate = new Date().toISOString().replace('T', ' ').replace(/\..*$/, '')
     return (
       <div>
-        <h1>ethereum mainnet</h1>
+        <h1>
+          ethereum mainnet <small>UTC {isoDate}</small>
+        </h1>
         <h2>blocks</h2>
         <VizBlocks blocks={blocks} />
         <h2>mempool</h2>

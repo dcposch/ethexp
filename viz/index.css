@@ -4,6 +4,7 @@
 
 body {
   font: 11px Arial;
+  font-variant-numeric: tabular-nums;
   line-height: 1.5;
   width: 800px;
   margin: 0 auto;
@@ -11,6 +12,16 @@ body {
 
 div {
   box-sizing: border-box;
+}
+
+h1 {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+
+h1 small {
+  font: bold 12px Arial;
 }
 
 .viz-peers,
@@ -78,10 +89,6 @@ div {
   width: 100%;
   border: 1px solid #333;
   padding: 6px;
-}
-
-.viz-block-num {
-  font-weight: bold;
 }
 
 .viz-block-gas {
