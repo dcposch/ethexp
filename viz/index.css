@@ -42,26 +42,28 @@ h1 small {
 
 .viz-peers {
   display: grid;
-  grid-template-columns: repeat(auto-fill, 92px);
+  grid-template-rows: repeat(10, 1fr);
+  grid-template-columns: repeat(5, 140px);
+  grid-auto-flow: column;
   grid-gap: 6px;
   justify-content: space-between;
 }
 
-.viz-peers::after {
-  content: '';
-  flex: auto;
-}
-
 .viz-peer {
   font-size: 9px;
-  padding: 6px;
-  border: 1px solid #666;
-  margin: 4px 0;
-}
-
-.viz-peer-inner {
   white-space: nowrap;
   overflow: hidden;
+}
+
+.viz-peer-country {
+  display: inline-block;
+  font-weight: bold;
+  width: 16px;
+}
+
+.viz-peer-ip {
+  display: inline-block;
+  width: 70px;
 }
 
 .viz-blocks hr {

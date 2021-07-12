@@ -27,24 +27,29 @@ export function VizPeers({ peers }: { peers: PeerGeo[] }) {
     const ab = ip.parse(a.ip).toByteArray()
     const bb = ip.parse(b.ip).toByteArray()
     for (let i = 0; i < 4; i++) {
-      cmp = bb[i] - ab[i]
+      cmp = ab[i] - bb[i]
       if (cmp != 0) return cmp
     }
     return cmp
   })
 
+  const nRows = Math.max(5, Math.ceil(peers.length / 5))
+  const gridRows = `repeat(${nRows}, 1fr)`
+
+  let lastCountry = ''
   return (
-    <div className='viz-peers'>
-      {peers.map((a) => (
-        <div className='viz-peer' key={a.id}>
-          <div className='viz-peer-inner'>
-            <div>
-              <strong>{a.geo.country}</strong> {a.ip}
-            </div>
-            <div>{a.name.split('-')[0]}</div>
+    <div className='viz-peers' style={{ gridTemplateRows: gridRows }}>
+      {peers.map((p) => {
+        const dispCountry = lastCountry === p.geo.country ? '' : p.geo.country
+        lastCountry = p.geo.country
+        return (
+          <div className='viz-peer' key={p.id}>
+            <span className='viz-peer-country'>{dispCountry}</span>
+            <span className='viz-peer-ip'>{p.ip}</span>
+            <span className='viz-peer-client'>{p.name.split('-')[0]}</span>
           </div>
-        </div>
-      ))}
+        )
+      })}
     </div>
   )
 }
