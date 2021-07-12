@@ -15,13 +15,22 @@ div {
 }
 
 h1 {
+  margin: 48px 0 24px 0;
+}
+
+h1,
+h2 {
   display: flex;
   justify-content: space-between;
   align-items: baseline;
 }
 
 h1 small {
-  font: bold 12px Arial;
+  font: bold 11px Arial;
+}
+
+h2 small {
+  font: 11px Arial;
 }
 
 .viz-peers,
@@ -111,4 +120,16 @@ h1 small {
 
 .viz-tx-reverted {
   background-color: #b00;
+}
+
+.viz-color-red {
+  color: #b00;
+}
+
+.viz-color-orange {
+  color: #b80;
+}
+
+.viz-color-green {
+  color: #070;
 }

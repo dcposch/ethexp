@@ -45,15 +45,31 @@ export function VizBlocks({ blocks }: { blocks: Block[] }) {
     ] as Block[]
   ).concat(blocks)
 
+  let nConfirmedTx = 0
+  for (let i = 0; i < blocks.length - 1; i++) {
+    nConfirmedTx += blocks[i].transactions.length
+  }
+  const elapsedTimeS =
+    (blocks[0].timestamp as number) - (blocks[blocks.length - 1].timestamp as number)
+  const tps = nConfirmedTx / elapsedTimeS
+
   return (
-    <div className='viz-blocks'>
-      <hr></hr>
-      {blocksPlusOffscreenBlock.map((b, i) => {
-        if (i > 0) rightPx += blockGapPx(nextBlockTime, b.timestamp as number)
-        nextBlockTime = b.timestamp as number
-        return <Block key={b.number} block={b} rightPx={rightPx} />
-      })}
-    </div>
+    <>
+      <h2>
+        blocks{' '}
+        <small>
+          last 10 blocks average <strong>{tps.toFixed(0)} TPS</strong>
+        </small>
+      </h2>
+      <div className='viz-blocks'>
+        <hr></hr>
+        {blocksPlusOffscreenBlock.map((b, i) => {
+          if (i > 0) rightPx += blockGapPx(nextBlockTime, b.timestamp as number)
+          nextBlockTime = b.timestamp as number
+          return <Block key={b.number} block={b} rightPx={rightPx} />
+        })}
+      </div>
+    </>
   )
 }
 

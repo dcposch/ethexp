@@ -17,6 +17,8 @@ interface AppState {
   blocks: Block[]
   // mempool transactions
   mempoolTransactions: MempoolTx[]
+  // latest gas price, in gwei
+  gasPrice: number
 }
 
 const MAX_BLOCKS = 10
@@ -34,7 +36,7 @@ class App extends React.Component<{}, AppState> {
     super(props)
     this.fetchTimeout = 0
     this.mempool = {}
-    this.state = { peers: [], blocks: [], mempoolTransactions: [] }
+    this.state = { peers: [], blocks: [], mempoolTransactions: [], gasPrice: 0 }
   }
 
   componentDidMount() {
@@ -50,18 +52,15 @@ class App extends React.Component<{}, AppState> {
   }
 
   render() {
-    const { peers, blocks, mempoolTransactions } = this.state
+    const { peers, blocks, mempoolTransactions, gasPrice } = this.state
     const isoDate = new Date().toISOString().replace('T', ' ').replace(/\..*$/, '')
     return (
       <div>
         <h1>
           ethereum mainnet <small>UTC {isoDate}</small>
         </h1>
-        <h2>blocks</h2>
         <VizBlocks blocks={blocks} />
-        <h2>mempool</h2>
-        <VizMempool transactions={mempoolTransactions} />
-        <h2>peers</h2>
+        <VizMempool gasPrice={gasPrice} transactions={mempoolTransactions} />
         <VizPeers peers={peers} />
       </div>
     )
@@ -136,8 +135,12 @@ class App extends React.Component<{}, AppState> {
     })
     console.log(`updated mempool, before: ${countBefore} after: ${mempoolTransactions.length} tx`)
 
+    console.log('fetching gas price')
+    const gasPriceWei = await web3.eth.getGasPrice()
+    const gasPrice = web3.utils.toBN(gasPriceWei).toNumber() * 1e-9
+
     console.log('fetch complete')
-    this.setState({ peers: peerGeos, blocks, mempoolTransactions })
+    this.setState({ peers: peerGeos, blocks, mempoolTransactions, gasPrice })
     this.fetchTimeout = window.setTimeout(this.fetch, FETCH_INT_MS)
   }
 

@@ -19,8 +19,6 @@ export interface PeerGeo extends Peer {
 export function VizPeers({ peers }: { peers: PeerGeo[] }) {
   if (peers.length === 0) return <div>zero peers. offline?</div>
 
-  const countries = new Set(peers.map((p) => p.geo.country))
-
   peers.sort((a: PeerGeo, b: PeerGeo) => {
     let cmp = a.geo.country.localeCompare(b.geo.country)
     if (cmp != 0) return cmp
@@ -38,18 +36,23 @@ export function VizPeers({ peers }: { peers: PeerGeo[] }) {
 
   let lastCountry = ''
   return (
-    <div className='viz-peers' style={{ gridTemplateRows: gridRows }}>
-      {peers.map((p) => {
-        const dispCountry = lastCountry === p.geo.country ? '' : p.geo.country
-        lastCountry = p.geo.country
-        return (
-          <div className='viz-peer' key={p.id}>
-            <span className='viz-peer-country'>{dispCountry}</span>
-            <span className='viz-peer-ip'>{p.ip}</span>
-            <span className='viz-peer-client'>{p.name.split('-')[0]}</span>
-          </div>
-        )
-      })}
-    </div>
+    <>
+      <h2>
+        peers<small>{peers.length} peers connected</small>
+      </h2>
+      <div className='viz-peers' style={{ gridTemplateRows: gridRows }}>
+        {peers.map((p) => {
+          const dispCountry = lastCountry === p.geo.country ? '' : p.geo.country
+          lastCountry = p.geo.country
+          return (
+            <div className='viz-peer' key={p.id}>
+              <span className='viz-peer-country'>{dispCountry}</span>
+              <span className='viz-peer-ip'>{p.ip}</span>
+              <span className='viz-peer-client'>{p.name.split('-')[0]}</span>
+            </div>
+          )
+        })}
+      </div>
+    </>
   )
 }
