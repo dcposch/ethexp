@@ -149,7 +149,7 @@ class App extends React.Component<{}, AppState> {
   }
 }
 
-const web3 = new Web3('ws://192.168.1.25:8546')
+const web3 = new Web3('ws://localhost:8546')
 const web3Admin = web3.extend({
   methods: [
     {
