@@ -15,6 +15,7 @@ geth --ws --ws.api eth,admin,txpool
 clone the repo, then run the following.
 
 ```
+cd viz
 npm ci
 npm start
 ```
