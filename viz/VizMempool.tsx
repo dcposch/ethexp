@@ -1,7 +1,6 @@
-import classNames from 'classnames'
 import * as React from 'react'
 
-import type { Transaction } from 'web3-eth'
+import VizTx from './VizTx'
 
 export interface MempoolTx {
   hash: string
@@ -52,14 +51,7 @@ export function VizMempool({
           const right = col * STRIDE_X_PX
           const top = ix * STRIDE_Y_PX
 
-          const cl = classNames({
-            'viz-tx': true,
-            'viz-tx-succeeded': t.status === true,
-            'viz-tx-reverted': t.status === false,
-          })
-          return (
-            <div key={t.hash} className={cl} style={{ right: right + 'px', top: top + 'px' }} />
-          )
+          return <VizTx key={t.hash} status={t.status} top={top} right={right} />
         })}
       </div>
     </>

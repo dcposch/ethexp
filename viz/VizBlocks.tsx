@@ -2,6 +2,7 @@ import * as React from 'react'
 import { useState } from 'react'
 
 import type { BlockTransactionObject, TransactionReceipt } from 'web3-eth'
+import VizTx from './VizTx'
 
 const PX_PER_SQRT_S = 50
 
@@ -9,69 +10,82 @@ export interface Block extends BlockTransactionObject {
   receipts: { [hash: string]: TransactionReceipt }
 }
 
-export function VizBlocks({ blocks }: { blocks: Block[] }) {
-  if (blocks.length === 0) {
-    return null
-  }
-
-  let nextBlockTime = new Date().getTime() * 1e-3
-  // calculate where the next block would be (offscreen)
-  // so that one it arrives, the animation is seamless
-  let rightPx = -blockGapPx(nextBlockTime, blocks[0].timestamp as number)
-  const blocksPlusOffscreenBlock = (
-    [
-      {
-        difficulty: 0,
-        extraData: '',
-        gasLimit: 0,
-        gasUsed: 0,
-        hash: '',
-        logsBloom: '',
-        miner: '',
-        nonce: '',
-        number: blocks[0].number + 1,
-        parentHash: '',
-        receiptRoot: '',
-        receipts: {},
-        sha3Uncles: '',
-        size: 0,
-        stateRoot: '',
-        timestamp: nextBlockTime,
-        totalDifficulty: 0,
-        transactionRoot: '',
-        transactions: [],
-        uncles: [],
-      },
-    ] as Block[]
-  ).concat(blocks)
-
-  let nConfirmedTx = 0
-  for (let i = 0; i < blocks.length - 1; i++) {
-    nConfirmedTx += blocks[i].transactions.length
-  }
-  const elapsedTimeS =
-    (blocks[0].timestamp as number) - (blocks[blocks.length - 1].timestamp as number)
-  const tps = nConfirmedTx / elapsedTimeS
-
-  return (
-    <>
-      <h2>
-        blocks{' '}
-        <small>
-          last 10 blocks average <strong>{tps.toFixed(0)} TPS</strong>
-        </small>
-      </h2>
-      <div className='viz-blocks'>
-        <hr></hr>
-        {blocksPlusOffscreenBlock.map((b, i) => {
-          if (i > 0) rightPx += blockGapPx(nextBlockTime, b.timestamp as number)
-          nextBlockTime = b.timestamp as number
-          return <Block key={b.number} block={b} rightPx={rightPx} />
-        })}
-      </div>
-    </>
-  )
+interface VizBlocksProps {
+  blocks: Block[]
 }
+
+export const VizBlocks = React.memo(
+  function VizBlocks({ blocks }: VizBlocksProps) {
+    if (blocks.length === 0) {
+      return null
+    }
+
+    let nextBlockTime = new Date().getTime() * 1e-3
+    // calculate where the next block would be (offscreen)
+    // so that one it arrives, the animation is seamless
+    let rightPx = -blockGapPx(nextBlockTime, blocks[0].timestamp as number)
+    const blocksPlusOffscreenBlock = (
+      [
+        {
+          difficulty: 0,
+          extraData: '',
+          gasLimit: 0,
+          gasUsed: 0,
+          hash: '',
+          logsBloom: '',
+          miner: '',
+          nonce: '',
+          number: blocks[0].number + 1,
+          parentHash: '',
+          receiptRoot: '',
+          receipts: {},
+          sha3Uncles: '',
+          size: 0,
+          stateRoot: '',
+          timestamp: nextBlockTime,
+          totalDifficulty: 0,
+          transactionRoot: '',
+          transactions: [],
+          uncles: [],
+        },
+      ] as Block[]
+    ).concat(blocks)
+
+    let nConfirmedTx = 0
+    for (let i = 0; i < blocks.length - 1; i++) {
+      nConfirmedTx += blocks[i].transactions.length
+    }
+    const elapsedTimeS =
+      (blocks[0].timestamp as number) - (blocks[blocks.length - 1].timestamp as number)
+    const tps = nConfirmedTx / elapsedTimeS
+
+    return (
+      <>
+        <h2>
+          blocks{' '}
+          <small>
+            last 10 blocks average <strong>{tps.toFixed(0)} TPS</strong>
+          </small>
+        </h2>
+        <div className='viz-blocks'>
+          <hr></hr>
+          {blocksPlusOffscreenBlock.map((b, i) => {
+            if (i > 0) rightPx += blockGapPx(nextBlockTime, b.timestamp as number)
+            nextBlockTime = b.timestamp as number
+            return <Block key={b.number} block={b} rightPx={rightPx} />
+          })}
+        </div>
+      </>
+    )
+  },
+  function (oldProps: VizBlocksProps, newProps: VizBlocksProps) {
+    return (
+      oldProps.blocks.length &&
+      newProps.blocks.length &&
+      oldProps.blocks[0].hash === newProps.blocks[0].hash
+    )
+  }
+)
 
 function blockGapPx(timestampNew: number, timestampParent: number) {
   const gapPx = Math.sqrt(Math.max(0, timestampNew - timestampParent)) * PX_PER_SQRT_S
@@ -98,13 +112,10 @@ function Block({ block, rightPx }: { block?: Block; rightPx: number }) {
             const left = (i % TX_PER_ROW) * STRIDE_PX
             const top = ((i / TX_PER_ROW) | 0) * STRIDE_PX
             const status = block.receipts[t.hash].status
-            return (
-              <div
-                key={t.hash}
-                className={`viz-tx viz-tx-${status ? 'succeeded' : 'reverted'}`}
-                style={{ left: left + 'px', top: top + 'px' }}
-              />
-            )
+            const toAddr = t.to?.toLowerCase()
+            const hl = toAddr === '0x7a250d5630b4cf539739df2c5dacb4c659f2488d'
+            if (Math.random() < 0.001) console.log(toAddr)
+            return <VizTx key={t.hash} status={status} top={top} left={left} highlight={hl} />
           })}
         </div>
       </>

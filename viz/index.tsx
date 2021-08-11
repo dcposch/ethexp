@@ -36,7 +36,12 @@ class App extends React.Component<{}, AppState> {
     super(props)
     this.fetchTimeout = 0
     this.mempool = {}
-    this.state = { peers: [], blocks: [], mempoolTransactions: [], gasPrice: 0 }
+    this.state = {
+      peers: [],
+      blocks: [],
+      mempoolTransactions: [],
+      gasPrice: 0,
+    }
   }
 
   componentDidMount() {
@@ -149,7 +154,11 @@ class App extends React.Component<{}, AppState> {
   }
 }
 
-const web3 = new Web3('ws://localhost:8546')
+let wsHost = location.hostname
+if (location.hash.length > 1) {
+  wsHost = location.hash.substr(1)
+}
+const web3 = new Web3(`ws://${wsHost}:8546`)
 const web3Admin = web3.extend({
   methods: [
     {
